@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>HTML audio player with playlist</title>
+    <style media="screen">
+      #playlist, audio {
+        background: #666;
+        width: 400px;
+        padding: 20px;
+      }
+      #playlist h2 {
+        margin: 0px;
+      }
+      .active a {
+        color:#14f214;
+        text-decoration: none;
+      }
+      ul {
+        list-style-type: none;
+      }
+      li a {
+        color:  #eeeedd;
+        background: #333;
+        padding: 5px;
+        display: block;
+        text-decoration: none;
+      }
+      li:not(.active) a:hover {
+        color: #5DB0E6;
+      }
+    </style>
+    <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function(event) {
+      start();
+    });
+
+    function start(){
+      var current = 0;
+      var audio = document.getElementById('audio');
+      var playlist = document.getElementById('playlist');
+      var tracks = playlist.querySelectorAll("li a");
+      var len = tracks.length;
+      audio.volume = .10;
+      audio.play();
+      for (var i = 0; i < tracks.length; i++) {
+          tracks[i].addEventListener('click', function(event) {
+              event.preventDefault();
+              var link = event.target;
+              current = indexInParent(link.parentNode) - 1;
+              run(link, audio);
+          });
+      }
+
+      audio.addEventListener('ended' ,function(event) {
+          current++;
+          if( current == len) {
+              current = 0;
+              link = playlist.querySelectorAll('a')[0];
+          } else {
+              link = playlist.querySelectorAll('a')[current];
+          }
+          run(link, audio);
+      });
+    }
+
+    function indexInParent(node) {
+        var children = node.parentNode.childNodes;
+        var num = 0;
+        for (var i=0; i<children.length; i++) {
+             if (children[i]==node) return num;
+             if (children[i].nodeType==1) num++;
+        }
+        return -1;
+    }
+
+    function run(link, player){
+          player.src = link.getAttribute('href');
+          var liParent = link.parentNode;
+          liParent.className += 'active';
+          removeSiblingsActive(liParent);
+          player.load();
+          player.play();
+    }
+
+    function removeSiblingsActive(current) {
+      var liSiblings = playlist.querySelectorAll("li");
+      for (var i = 0; i < liSiblings.length; i++) {
+        if (liSiblings[i] !== current) {
+          liSiblings[i].classList.remove("active");
+        }
+      }
+    }
+
+    </script>
+  </head>
+  <body>
+    <h1>Check out our playlist!</h1>
+    <audio id="audio" preload="auto" tabindex="0" controls="" type="audio/mpeg">
+        <source type="audio/mp3" src="http://cdn.mos.musicradar.com/audio/samples/lofi-demo-loops/AutoBot%2870%29.mp3">
+        Sorry, your browser does not support HTML5 audio.
+    </audio>
+    <ul id="playlist">
+      <h2>Playlist</h2>
+      <li class="active"><a href="http://cdn.mos.musicradar.com/audio/samples/lofi-demo-loops/AutoBot%2870%29.mp3">Drum beat</a></li>
+      <li><a href="http://cdn.mos.musicradar.com/audio/samples/lofi-demo-loops/32.mp3">FX sound</a></li>
+      <li><a href="http://cdn.mos.musicradar.com/audio/samples/lofi-demo-loops/Bass%201.mp3">Bass</a></li>
+      <li><a href="http://cdn.mos.musicradar.com/audio/samples/lofi-demo-loops/PlinkLead.mp3">Lead</a></li>
+    </ul>
+  </body>
+</html>
